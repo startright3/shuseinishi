@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="theme-color" content="#111827">
+  <title>START RIGHT｜相談窓口</title>
+  <style>
+    *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:#f6f7f9;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Segoe UI",sans-serif}.wrap{max-width:760px;margin:auto;padding:calc(20px + env(safe-area-inset-top)) 16px calc(56px + env(safe-area-inset-bottom))}.brand{font-weight:900;letter-spacing:.04em;font-size:20px}.hero{background:#fff;border:1px solid #e5e7eb;border-radius:22px;padding:26px;margin-top:16px;box-shadow:0 10px 32px rgba(0,0,0,.05)}h1{font-size:30px;line-height:1.28;margin:12px 0}h2{font-size:20px;margin:28px 0 10px}p{line-height:1.7;color:#4b5563}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{display:block;background:#fff;border:1px solid #d1d5db;border-radius:14px;padding:14px;line-height:1.45}.choice input{margin-right:8px}label.field{display:block;font-weight:700;margin:16px 0 6px}input[type=text],input[type=email],input[type=tel],textarea{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:13px;font:inherit;background:#fff;font-size:16px}textarea{min-height:130px;resize:vertical}.submit{width:100%;margin-top:20px;border:0;border-radius:13px;padding:15px;background:#111827;color:#fff;font-weight:800;font-size:16px}.submit:disabled{opacity:.55}.note{font-size:12px;color:#6b7280}.hp{position:absolute;left:-9999px;opacity:0}.badge{display:inline-block;border-radius:999px;background:#eef2ff;padding:7px 12px;font-weight:700;font-size:13px}.error{display:none;color:#b91c1c;font-weight:700}.done{display:none;text-align:center;padding:36px 0}.done h2{font-size:26px}.loading{text-align:center;padding:28px 0;color:#6b7280}@media(max-width:560px){.grid{grid-template-columns:1fr}h1{font-size:26px}.hero{padding:21px}.wrap{padding-left:14px;padding-right:14px}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <div class="brand">START RIGHT</div>
+  <section class="hero">
+    <div id="loading" class="loading">相談窓口を確認しています…</div>
+    <div id="formArea" style="display:none">
+      <span class="badge">地域タッチポイント</span>
+      <h1>困ったときに、すぐ相談できる入口。</h1>
+      <p>物流・軽貨物の仕事・AI/DX・地域連携について、内容に合う担当へつなぎます。まだ依頼内容が固まっていなくても構いません。</p>
+      <p id="error" class="error"></p>
+      <form id="inquiryForm">
+        <input type="hidden" name="tp" id="tp">
+        <div class="hp"><label>Website<input type="text" name="website" autocomplete="off" tabindex="-1"></label></div>
+        <h2>相談したいこと</h2>
+        <div class="grid">
+          <label class="choice"><input required type="radio" name="inquiry_type" value="logistics">急な配送・追加便・物流相談</label>
+          <label class="choice"><input required type="radio" name="inquiry_type" value="driver">軽貨物の仕事・案件情報</label>
+          <label class="choice"><input required type="radio" name="inquiry_type" value="ai_dx">AI・業務改善・DX相談</label>
+          <label class="choice"><input required type="radio" name="inquiry_type" value="collaboration">イベント・地域連携・協業</label>
+        </div>
+        <label class="field">お名前 *</label><input required type="text" name="name" maxlength="120" autocomplete="name">
+        <label class="field">会社・団体名</label><input type="text" name="organization" maxlength="180" autocomplete="organization">
+        <label class="field">メールアドレス</label><input type="email" name="email" maxlength="200" autocomplete="email" inputmode="email">
+        <label class="field">電話番号</label><input type="tel" name="phone" maxlength="40" autocomplete="tel" inputmode="tel">
+        <p class="note">メールまたは電話番号のどちらか1つは入力してください。</p>
+        <label class="field">ご相談内容 *</label><textarea required name="message" maxlength="3000" placeholder="例：明日だけ札幌市内で追加便が必要、社内の受付業務をAI化したい、イベントで物流面を相談したい 等"></textarea>
+        <label style="display:block;margin-top:16px;line-height:1.6"><input required type="checkbox" name="reply_consent" value="yes"> 返信・相談対応のため、入力内容をSTART RIGHTが利用することに同意します。</label>
+        <button id="submitBtn" class="submit" type="submit">相談内容を送信</button>
+        <p class="note">QRコードを読み取っただけでは氏名・連絡先を取得しません。営業目的の第三者提供は行いません。送信内容はご相談への返信・対応およびサービス改善に利用します。</p>
+      </form>
+    </div>
+    <div id="done" class="done"><span class="badge">送信完了</span><h2>ご相談を受け付けました。</h2><p>内容を確認し、必要に応じてSTART RIGHTからご連絡します。</p><p class="note">この画面は閉じていただいて構いません。</p></div>
+    <div id="invalid" class="done"><h2>このQRコードは現在ご利用いただけません。</h2><p>配布元へご確認ください。</p></div>
+  </section>
+</main>
+<script>
+(function(){
+  const API='https://mwrkyjbjjfelccgjkyop.supabase.co/functions/v1/touchpoint-hub';
+  const params=new URLSearchParams(location.search);
+  const code=(params.get('tp')||params.get('code')||'').trim();
+  const loading=document.getElementById('loading');
+  const formArea=document.getElementById('formArea');
+  const invalid=document.getElementById('invalid');
+  const form=document.getElementById('inquiryForm');
+  const err=document.getElementById('error');
+  const btn=document.getElementById('submitBtn');
+  document.getElementById('tp').value=code;
+
+  async function init(){
+    if(!/^[A-Za-z0-9_-]{6,32}$/.test(code)){loading.style.display='none';invalid.style.display='block';return;}
+    try{
+      const r=await fetch(API+'?tp='+encodeURIComponent(code),{method:'GET',cache:'no-store'});
+      if(!r.ok) throw new Error('invalid');
+      loading.style.display='none';formArea.style.display='block';
+    }catch(_){loading.style.display='none';invalid.style.display='block';}
+  }
+
+  form.addEventListener('submit',async function(e){
+    e.preventDefault();err.style.display='none';
+    const data=new FormData(form);
+    if(!data.get('email')&&!data.get('phone')){err.textContent='メールまたは電話番号のどちらか1つを入力してください。';err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});return;}
+    btn.disabled=true;btn.textContent='送信中…';
+    try{
+      const r=await fetch(API+'?tp='+encodeURIComponent(code),{method:'POST',body:data});
+      if(!r.ok){const t=await r.text();throw new Error(t||'submit');}
+      formArea.style.display='none';document.getElementById('done').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+    }catch(e){err.textContent=(e&&e.message&&e.message.length<120)?e.message:'送信できませんでした。時間をおいて再度お試しください。';err.style.display='block';btn.disabled=false;btn.textContent='相談内容を送信';err.scrollIntoView({behavior:'smooth',block:'center'});}
+  });
+  init();
+})();
+</script>
+</body>
+</html>
