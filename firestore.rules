@@ -32,8 +32,16 @@ service cloud.firestore {
       // Approved members can read all member profiles
       allow read: if isApproved();
 
-      // Only admin can create, update, or delete members
-      allow write: if isAdmin();
+      // Approved member can create their own profile (userId must match)
+      allow create: if isApproved()
+        && request.resource.data.userId == request.auth.uid;
+
+      // Approved member can update their own profile; admin can update any
+      allow update: if isAdmin()
+        || (isApproved() && resource.data.userId == request.auth.uid);
+
+      // Only admin can delete
+      allow delete: if isAdmin();
     }
   }
 }

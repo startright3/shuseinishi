@@ -15,12 +15,16 @@ export function ProfilePage() {
   const { profile, isLoading, saveProfile } = useMyProfile(firebaseUser?.uid ?? '')
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   async function handleSubmit(data: MemberInput) {
     setIsSaving(true)
+    setSaveError('')
     try {
       await saveProfile(data)
       setIsEditing(false)
+    } catch {
+      setSaveError('保存に失敗しました。もう一度お試しください。')
     } finally {
       setIsSaving(false)
     }
@@ -99,6 +103,9 @@ export function ProfilePage() {
               <div className="mt-3 flex justify-center">
                 <Spinner size="sm" />
               </div>
+            )}
+            {saveError && (
+              <p className="mt-2 text-sm text-center text-red-500">{saveError}</p>
             )}
           </div>
         )}

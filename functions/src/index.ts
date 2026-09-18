@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin'
 import { onRequest } from 'firebase-functions/v2/https'
+import { defineString } from 'firebase-functions/params'
 import axios from 'axios'
 
 admin.initializeApp()
@@ -7,10 +8,18 @@ admin.initializeApp()
 const db = admin.firestore()
 const BRANCH = '札幌西'
 
+const LINE_CHANNEL_ID = defineString('LINE_CHANNEL_ID')
+
 interface LineProfile {
   userId: string
   displayName: string
   pictureUrl?: string
+}
+
+interface LineTokenVerify {
+  client_id: string
+  expires_in: number
+  scope: string
 }
 
 const ALLOWED_ORIGINS = [
@@ -42,6 +51,20 @@ export const lineCustomToken = onRequest(
       profile = response.data
     } catch {
       res.status(401).json({ error: 'Invalid LINE access token' })
+      return
+    }
+
+    // Verify the token belongs to this app's LINE Login channel
+    try {
+      const verifyRes = await axios.get<LineTokenVerify>(
+        `https://api.line.me/oauth2/v2.1/verify?access_token=${lineAccessToken}`,
+      )
+      if (verifyRes.data.client_id !== LINE_CHANNEL_ID.value()) {
+        res.status(401).json({ error: 'Token channel mismatch' })
+        return
+      }
+    } catch {
+      res.status(401).json({ error: 'Token verification failed' })
       return
     }
 
