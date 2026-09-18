@@ -28,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     return onAuthStateChanged(auth, user => {
+      if (user) setDocLoading(true)
       setFirebaseUser(user)
       setAuthLoading(false)
       if (!user) {

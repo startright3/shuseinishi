@@ -95,27 +95,22 @@ export function MemberDetailPage() {
 
       {/* Action buttons - fixed at bottom */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4 safe-area-bottom">
-        <div className="max-w-lg mx-auto flex gap-3">
+        <div className="max-w-lg mx-auto flex flex-col gap-2">
           {member.phone && (
             <a
               href={`tel:${member.phone.replace(/[^0-9+]/g, '')}`}
-              className="flex-1 h-14 bg-line-green text-white font-bold text-lg rounded-2xl flex items-center justify-center gap-2 active:bg-line-green-dark"
+              className="w-full h-14 bg-line-green text-white font-bold text-lg rounded-2xl flex items-center justify-center gap-2 active:bg-line-green-dark"
             >
               📞 電話する
             </a>
           )}
           {member.lineAvailable && (
-            <a
-              href={`https://line.me/R/`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 h-14 bg-[#00B900] text-white font-bold text-lg rounded-2xl flex items-center justify-center gap-2 active:opacity-80"
-            >
-              💬 LINE
-            </a>
+            <div className="w-full h-10 bg-green-50 rounded-xl flex items-center justify-center gap-2">
+              <span className="text-sm font-medium text-line-green">💬 LINE連絡可</span>
+            </div>
           )}
           {!member.phone && !member.lineAvailable && (
-            <p className="flex-1 text-center text-sm text-gray-400 py-4">連絡先未登録</p>
+            <p className="text-center text-sm text-gray-400 py-2">連絡先未登録</p>
           )}
         </div>
       </div>

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   getPendingUsers,
   updateUserStatus,
-  getMembers,
+  getAllMembersForAdmin,
   createMember,
   updateMember,
   deleteMember,
@@ -16,28 +16,18 @@ export function useAdmin() {
   const [isLoading, setIsLoading] = useState(false)
 
   const loadPending = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      const users = await getPendingUsers()
-      setPendingUsers(users)
-    } finally {
-      setIsLoading(false)
-    }
+    const users = await getPendingUsers()
+    setPendingUsers(users)
   }, [])
 
   const loadMembers = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      const result = await getMembers()
-      setMembers(result.members)
-    } finally {
-      setIsLoading(false)
-    }
+    const all = await getAllMembersForAdmin()
+    setMembers(all)
   }, [])
 
   useEffect(() => {
-    loadPending()
-    loadMembers()
+    setIsLoading(true)
+    Promise.all([loadPending(), loadMembers()]).finally(() => setIsLoading(false))
   }, [loadPending, loadMembers])
 
   async function approveUser(uid: string) {

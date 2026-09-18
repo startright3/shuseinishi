@@ -44,11 +44,6 @@ export async function getPendingUsers(): Promise<UserDoc[]> {
   return snap.docs.map(d => ({ uid: d.id, ...d.data() } as UserDoc))
 }
 
-export async function getAllUsers(): Promise<UserDoc[]> {
-  const snap = await getDocs(collection(db, 'users'))
-  return snap.docs.map(d => ({ uid: d.id, ...d.data() } as UserDoc))
-}
-
 // Members
 
 const PAGE_SIZE = 50
@@ -130,4 +125,16 @@ export async function updateMember(id: string, data: Partial<MemberInput>): Prom
 
 export async function deleteMember(id: string): Promise<void> {
   await deleteDoc(doc(db, 'members', id))
+}
+
+export async function getAllMembersForAdmin(): Promise<MemberDoc[]> {
+  const all: MemberDoc[] = []
+  let after: QueryDocumentSnapshot | undefined
+  while (true) {
+    const page = await getMembers({ after })
+    all.push(...page.members)
+    if (!page.hasMore || !page.lastDoc) break
+    after = page.lastDoc
+  }
+  return all
 }

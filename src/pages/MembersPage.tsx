@@ -45,7 +45,9 @@ export function MembersPage() {
 
         {/* Results count */}
         {!isLoading && members.length > 0 && (
-          <p className="text-sm text-gray-500 mb-3">{members.length}件表示中</p>
+          <p className="text-sm text-gray-500 mb-3">
+            {members.length}件{hasMore ? '表示中（さらにあります）' : ''}
+          </p>
         )}
 
         {/* Member list */}

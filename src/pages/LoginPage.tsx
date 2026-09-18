@@ -1,10 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Spinner } from '../components/ui/Spinner'
 import { initLiff } from '../config/liff'
 
 export function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    initLiff().catch(err => {
+      console.error(err)
+      setError('ログインに失敗しました。もう一度お試しください。')
+      setIsLoading(false)
+    })
+  }, [])
 
   async function handleLogin() {
     setIsLoading(true)
