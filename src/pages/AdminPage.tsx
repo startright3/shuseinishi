@@ -140,7 +140,10 @@ export function AdminPage() {
                 {pendingUsers.map(user => (
                   <div key={user.uid} className="bg-white rounded-2xl p-4 shadow-sm">
                     <p className="font-semibold text-gray-900">{user.displayName}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">UID: {user.uid}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {user.branch && <span className="mr-2">🏢 {user.branch}</span>}
+                      登録日: {user.createdAt?.toDate?.()?.toLocaleDateString('ja-JP') ?? '不明'}
+                    </p>
                     <div className="flex gap-2 mt-3">
                       <Button size="sm" onClick={() => handleApprove(user.uid)} className="flex-1">
                         承認

@@ -2,6 +2,7 @@ import type { Timestamp } from 'firebase/firestore'
 
 export interface MemberDoc {
   id: string
+  userId?: string
   branch: string
   companyName: string
   representative: string

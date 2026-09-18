@@ -96,6 +96,14 @@ export async function getMemberById(id: string): Promise<MemberDoc | null> {
   return snap.exists() ? ({ id: snap.id, ...snap.data() } as MemberDoc) : null
 }
 
+export async function getMemberByUserId(userId: string): Promise<MemberDoc | null> {
+  const q = query(collection(db, 'members'), where('userId', '==', userId), limit(1))
+  const snap = await getDocs(q)
+  if (snap.empty) return null
+  const d = snap.docs[0]
+  return { id: d.id, ...d.data() } as MemberDoc
+}
+
 export async function createMember(data: MemberInput): Promise<string> {
   const ref = doc(collection(db, 'members'))
   const searchTokens = buildSearchTokens(data)

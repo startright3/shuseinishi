@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useMembers } from '../hooks/useMembers'
 import { useAuthContext } from '../contexts/AuthContext'
+import { useAuth } from '../hooks/useAuth'
 import { MemberCard } from '../components/member/MemberCard'
 import { MemberSearchBar } from '../components/member/MemberSearchBar'
 import { IndustryFilter } from '../components/member/IndustryFilter'
@@ -9,7 +10,8 @@ import { Spinner } from '../components/ui/Spinner'
 import { EmptyState } from '../components/ui/EmptyState'
 
 export function MembersPage() {
-  const { isAdmin } = useAuthContext()
+  const { isAdmin, userDoc } = useAuthContext()
+  const { logout } = useAuth()
   const { members, isLoading, hasMore, search, setSearch, industry, setIndustry, loadMore, refresh } = useMembers()
 
   useEffect(() => {
@@ -32,6 +34,20 @@ export function MembersPage() {
                 管理
               </Link>
             )}
+            <Link
+              to="/profile"
+              className="h-9 w-9 bg-line-green rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0"
+              title={userDoc?.displayName ?? 'マイプロフィール'}
+            >
+              {userDoc?.displayName?.charAt(0) ?? '?'}
+            </Link>
+            <button
+              onClick={() => logout()}
+              className="h-9 px-2 text-gray-400 text-xs hover:text-gray-600"
+              title="ログアウト"
+            >
+              ログアウト
+            </button>
           </div>
         </div>
       </header>

@@ -10,6 +10,7 @@ import { MembersPage } from './pages/MembersPage'
 
 const MemberDetailPage = lazy(() => import('./pages/MemberDetailPage').then(m => ({ default: m.MemberDetailPage })))
 const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })))
+const ProfilePage = lazy(() => import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })))
 
 function SuspenseFallback() {
   return (
@@ -41,6 +42,16 @@ export default function App() {
               <ProtectedRoute>
                 <Suspense fallback={<SuspenseFallback />}>
                   <MemberDetailPage />
+                </Suspense>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Suspense fallback={<SuspenseFallback />}>
+                  <ProfilePage />
                 </Suspense>
               </ProtectedRoute>
             }
