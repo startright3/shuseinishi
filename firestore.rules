@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isApproved() {
+      return isAuthenticated() && userDoc().status == 'approved';
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && userDoc().role == 'admin';
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Own user doc: read only (to get status/role for auth context)
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+
+      // Admin: full access to all user docs
+      allow read, write: if isAdmin();
+    }
+
+    // Members collection
+    match /members/{memberId} {
+      // Approved members can read all member profiles
+      allow read: if isApproved();
+
+      // Only admin can create, update, or delete members
+      allow write: if isAdmin();
+    }
+  }
+}
