@@ -144,7 +144,41 @@ LINE Developers Console の LIFF エンドポイント URL に設定する。
 
 ---
 
-### 6. 初回 admin ユーザーの作成
+### 6. GitHub Actions による自動デプロイ（任意）
+
+`main` ブランチへの push で自動的に `firebase deploy` を実行するワークフローを用意している（`.github/workflows/firebase-deploy.yml`）。手動デプロイに慣れたら以下の設定で有効化できる。
+
+#### 6-1. Firebase サービスアカウントキーを発行
+
+```bash
+# Firebase コンソール → プロジェクト設定 → サービスアカウント → 新しい秘密鍵を生成
+# ダウンロードした JSON ファイルの中身をそのまま GitHub Secrets に登録する
+```
+
+#### 6-2. GitHub リポジトリに Secrets を登録
+
+リポジトリ → Settings → Secrets and variables → Actions → New repository secret
+
+| Secret 名 | 値 |
+|---|---|
+| `FIREBASE_SERVICE_ACCOUNT` | 6-1 でダウンロードした JSON ファイルの中身（全文）|
+| `VITE_FIREBASE_API_KEY` | `.env` と同じ値 |
+| `VITE_FIREBASE_AUTH_DOMAIN` | 同上 |
+| `VITE_FIREBASE_PROJECT_ID` | 同上（Firebase プロジェクトID）|
+| `VITE_FIREBASE_STORAGE_BUCKET` | 同上 |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | 同上 |
+| `VITE_FIREBASE_APP_ID` | 同上 |
+| `VITE_LIFF_ID` | 同上 |
+| `VITE_FUNCTIONS_URL` | 本番の Cloud Functions URL |
+| `LINE_CHANNEL_ID` | LINE Developers Console のチャンネルID |
+
+登録後、`main` ブランチに push するたびに自動で `npm run build` → `firebase deploy`（Hosting + Firestore Rules/Indexes + Functions）が実行される。GitHub の Actions タブから手動実行（`workflow_dispatch`）も可能。
+
+> **注意:** サービスアカウントキーは強い権限を持つ秘密情報。GitHub Secrets 以外の場所（コード・Issue・PRコメント等）に貼り付けないこと。
+
+---
+
+### 7. 初回 admin ユーザーの作成
 
 アプリを一度開いてLINEログインし、自分の LINE UID を確認した後、以下のスクリプトを実行：
 
@@ -179,6 +213,9 @@ shuseinishi/
 │
 ├── scripts/
 │   └── create-admin.js  # 初回 admin 作成スクリプト
+│
+├── .github/workflows/
+│   └── firebase-deploy.yml  # main push で自動デプロイ
 │
 ├── firestore.rules      # セキュリティルール
 ├── firestore.indexes.json
