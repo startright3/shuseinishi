@@ -11,7 +11,7 @@ type Tab = 'pending' | 'members'
 
 export function AdminPage() {
   const navigate = useNavigate()
-  const { pendingUsers, members, isLoading, approveUser, rejectUser, addMember, editMember, removeMember } = useAdmin()
+  const { pendingUsers, members, isLoading, loadError, approveUser, rejectUser, addMember, editMember, removeMember } = useAdmin()
   const [tab, setTab] = useState<Tab>('pending')
   const [editingMember, setEditingMember] = useState<MemberDoc | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -120,6 +120,9 @@ export function AdminPage() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 pt-4 pb-10">
+        {loadError && (
+          <div className="mb-3 p-3 bg-red-50 text-red-600 text-sm rounded-xl">{loadError}</div>
+        )}
         {actionError && (
           <div className="mb-3 p-3 bg-red-50 text-red-600 text-sm rounded-xl">{actionError}</div>
         )}

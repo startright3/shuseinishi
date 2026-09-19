@@ -14,6 +14,7 @@ export function useAdmin() {
   const [pendingUsers, setPendingUsers] = useState<UserDoc[]>([])
   const [members, setMembers] = useState<MemberDoc[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [loadError, setLoadError] = useState('')
 
   const loadPending = useCallback(async () => {
     const users = await getPendingUsers()
@@ -27,7 +28,10 @@ export function useAdmin() {
 
   useEffect(() => {
     setIsLoading(true)
-    Promise.all([loadPending(), loadMembers()]).finally(() => setIsLoading(false))
+    setLoadError('')
+    Promise.all([loadPending(), loadMembers()])
+      .catch(() => setLoadError('データの読み込みに失敗しました。画面を再読み込みしてください。'))
+      .finally(() => setIsLoading(false))
   }, [loadPending, loadMembers])
 
   async function approveUser(uid: string) {
@@ -59,6 +63,7 @@ export function useAdmin() {
     pendingUsers,
     members,
     isLoading,
+    loadError,
     approveUser,
     rejectUser,
     addMember,
